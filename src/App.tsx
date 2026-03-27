@@ -1,14 +1,31 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { ZoneCard } from './components/ticket/ZoneCard';
 import { MerchItem } from './components/merch/MerchItem';
 import { BudgetSummary } from './components/budget/BudgetSummary';
 
 function App() {
-  const [total, setTotal] = useState(0);
   const CONCERT_BUDGET = 12000;
 
-  const addToTotal = (amount: number) => setTotal(prev => prev + amount);
-  const resetTotal = () => setTotal(0);
+  const [selectedPrice, setSelectedPrice] = useState(0);
+
+  const [merchQuantities, setMerchQuantities] = useState<{ [key: string]: number }>({
+    lightstick: 0,
+    album: 0,
+    photocard: 0
+  });
+
+  const total = useMemo(() => {
+    const merchTotal = 
+      (merchQuantities.lightstick * 1650) + 
+      (merchQuantities.album * 890) + 
+      (merchQuantities.photocard * 450);
+    return selectedPrice + merchTotal;
+  }, [selectedPrice, merchQuantities]);
+
+  const resetAll = () => {
+    setSelectedPrice(0);
+    setMerchQuantities({ lightstick: 0, album: 0, photocard: 0 });
+  };
 
   return (
     <div className="min-h-screen bg-pink-50 p-8 pb-48 font-sans">
@@ -27,10 +44,22 @@ function App() {
             <span className="text-xl">🎟️</span>
             <h2 className="text-lg font-bold text-gray-700">Select Your Zone</h2>
           </div>
-          <ZoneCard zoneName="VIP" price={6500} colorCode="#ffb3ba" />
-          <ZoneCard zoneName="B" price={5500} colorCode="#baffc9" />
-          <ZoneCard zoneName="C" price={4500} colorCode="#bae1ff" isAvailable={false} />
-          <ZoneCard zoneName="D" price={3500} colorCode="#ffffba" />
+          <ZoneCard 
+            zoneName="VIP" price={6500} colorCode="#ffb3ba" 
+            onSelect={setSelectedPrice} isSelected={selectedPrice === 6500}
+          />
+          <ZoneCard 
+            zoneName="B" price={5500} colorCode="#baffc9" 
+            onSelect={setSelectedPrice} isSelected={selectedPrice === 5500}
+          />
+          <ZoneCard 
+            zoneName="C" price={4500} colorCode="#bae1ff" isAvailable={false} 
+            onSelect={setSelectedPrice}
+          />
+          <ZoneCard 
+            zoneName="D" price={3500} colorCode="#ffffba" 
+            onSelect={setSelectedPrice} isSelected={selectedPrice === 3500}
+          />
         </section>
 
         {/* Section 2: Must-Have Merch */}
@@ -39,16 +68,30 @@ function App() {
             <span className="text-xl">🪄</span>
             <h2 className="text-lg font-bold text-gray-700">Must-Have Merch</h2>
           </div>
-          <MerchItem name="Official Lightstick" price={1650} imageUrl="🪄" />
-          <MerchItem name="Solo Album (Special Ver.)" price={890} imageUrl="💿" />
-          <MerchItem name="Photo Card Set" price={450} imageUrl="🃏" />
+          <MerchItem 
+            name="Official Lightstick" price={1650} imageUrl="🪄" 
+            quantity={merchQuantities.lightstick}
+            onUpdate={(q) => setMerchQuantities(prev => ({...prev, lightstick: q}))}
+          />
+          <MerchItem 
+            name="Solo Album (Special Ver.)" price={890} imageUrl="💿" 
+            quantity={merchQuantities.album}
+            onUpdate={(q) => setMerchQuantities(prev => ({...prev, album: q}))}
+          />
+          <MerchItem 
+            name="Photo Card Set" price={450} imageUrl="🃏" 
+            quantity={merchQuantities.photocard}
+            onUpdate={(q) => setMerchQuantities(prev => ({...prev, photocard: q}))}
+          />
         </section>
 
-        {/* Testing Controls */}
-        <div className="flex gap-3 justify-center items-center mt-6 p-4 bg-white/50 rounded-2xl border border-pink-100">
-           <span className="text-[10px] font-bold text-pink-400 uppercase">Test UI:</span>
-           <button onClick={() => addToTotal(1000)} className="text-[10px] bg-white px-3 py-1 rounded-full shadow-sm hover:bg-pink-100 text-pink-500">+1000</button>
-           <button onClick={resetTotal} className="text-[10px] bg-white px-3 py-1 rounded-full shadow-sm hover:bg-pink-100 text-pink-500">Reset</button>
+        <div className="flex justify-center mt-6">
+           <button 
+             onClick={resetAll} 
+             className="text-[10px] bg-white border border-pink-200 px-4 py-2 rounded-full shadow-sm hover:bg-pink-50 text-pink-400 font-bold uppercase tracking-widest"
+           >
+             Reset All Planning
+           </button>
         </div>
 
         <footer className="text-center text-pink-200 text-[10px] mt-10 uppercase tracking-widest font-bold">

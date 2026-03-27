@@ -5,16 +5,24 @@ interface ZoneCardProps {
   price: number;
   colorCode: string;
   isAvailable?: boolean;
+  onSelect: (price: number) => void;
+  isSelected?: boolean;
 }
 
 export const ZoneCard: React.FC<ZoneCardProps> = ({
   zoneName,
   price,
   colorCode,
-  isAvailable = true
+  isAvailable = true,
+  onSelect,
+  isSelected = false
 }) => {
   return (
-    <div className="flex items-center justify-between p-4 mb-4 bg-white border border-pink-100 rounded-2xl shadow-sm hover:shadow-md transition-shadow">
+    <div 
+      className={`flex items-center justify-between p-4 mb-4 bg-white border rounded-2xl shadow-sm transition-all duration-300 ${
+        isSelected ? 'border-pink-400 ring-2 ring-pink-100 shadow-md' : 'border-pink-100'
+      }`}
+    >
       <div className="flex items-center gap-4">
         {/* Zone color circle indicator */}
         <div 
@@ -32,13 +40,16 @@ export const ZoneCard: React.FC<ZoneCardProps> = ({
       {/* Action button */}
       <button 
         disabled={!isAvailable}
+        onClick={() => onSelect(price)}
         className={`px-4 py-2 text-sm font-semibold rounded-full transition-colors ${
-          isAvailable 
-            ? 'bg-pink-100 text-pink-600 hover:bg-pink-200' 
-            : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+          !isAvailable 
+            ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+            : isSelected
+              ? 'bg-pink-500 text-white shadow-inner'
+              : 'bg-pink-100 text-pink-600 hover:bg-pink-200'
         }`}
       >
-        {isAvailable ? 'Select' : 'Sold Out'}
+        {isAvailable ? (isSelected ? 'Selected' : 'Select') : 'Sold Out'}
       </button>
     </div>
   );
