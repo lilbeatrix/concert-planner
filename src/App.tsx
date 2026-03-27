@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react';
 import { ZoneCard } from './components/ticket/ZoneCard';
 import { MerchItem } from './components/merch/MerchItem';
 import { BudgetSummary } from './components/budget/BudgetSummary';
+import { Receipt } from './components/budget/Receipt';
 
 function App() {
   const CONCERT_BUDGET = 12000;
@@ -84,6 +85,12 @@ function App() {
             onUpdate={(q) => setMerchQuantities(prev => ({...prev, photocard: q}))}
           />
         </section>
+
+        {/* Section 3: Dynamic Receipt Breakdown */}
+        <Receipt 
+          selectedTicketPrice={selectedPrice} 
+          merchQuantities={merchQuantities} 
+        />
 
         <div className="flex justify-center mt-6">
            <button 
