@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { ZoneCard } from './components/ticket/ZoneCard';
 import { MerchItem } from './components/merch/MerchItem';
 import { BudgetSummary } from './components/budget/BudgetSummary';
@@ -7,13 +7,27 @@ import { Receipt } from './components/budget/Receipt';
 function App() {
   const CONCERT_BUDGET = 12000;
 
-  const [selectedPrice, setSelectedPrice] = useState(0);
-
-  const [merchQuantities, setMerchQuantities] = useState<{ [key: string]: number }>({
-    lightstick: 0,
-    album: 0,
-    photocard: 0
+  const [selectedPrice, setSelectedPrice] = useState<number>(() => {
+    const savedTicket = localStorage.getItem('planner_ticket');
+    return savedTicket ? Number(savedTicket) : 0;
   });
+
+  const [merchQuantities, setMerchQuantities] = useState<{ [key: string]: number }>(() => {
+    const savedMerch = localStorage.getItem('planner_merch');
+    return savedMerch ? JSON.parse(savedMerch) : {
+      lightstick: 0,
+      album: 0,
+      photocard: 0
+    };
+  });
+
+  useEffect(() => {
+    localStorage.setItem('planner_ticket', selectedPrice.toString());
+  }, [selectedPrice]);
+
+  useEffect(() => {
+    localStorage.setItem('planner_merch', JSON.stringify(merchQuantities));
+  }, [merchQuantities]);
 
   const total = useMemo(() => {
     const merchTotal = 
